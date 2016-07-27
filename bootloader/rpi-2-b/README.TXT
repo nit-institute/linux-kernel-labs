@@ -136,7 +136,10 @@ src/rootfs/ - minimalni rootfs (busybox)
 =========================================================================
 Bildovanje kernela
 =========================================================================
-git clone --depth=1 https://github.com/raspberrypi/linux
+git clone https://github.com/raspberrypi/linux
+git branch 4.4.15 dbf72a4d4531e7e5fb28e76d902d66f05c1bfe12
+git checkout 4.4.15
+
 cd linux
 make bcm2709_defconfig
 make
@@ -181,6 +184,14 @@ Bildovanje toolchain-a (buildroot)
 =========================================================================
 Bildovanje kernel-a, rootfs-a i toolchain-a (buildroot)
 =========================================================================
+verzija:
+	2016.08
+kernel:
+	custom
+	https://github.com/raspberrypi/linux
+	rpi-4.4.y
+	dbf72a4d4531e7e5fb28e76d902d66f05c1bfe12
+
 preuzimanje najnovije verzije buildroot-a
 	git clone git://git.buildroot.net/buildroot 
 	cd buildroot/

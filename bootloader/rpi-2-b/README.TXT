@@ -137,8 +137,8 @@ src/rootfs/ - minimalni rootfs (busybox)
 Bildovanje kernela
 =========================================================================
 git clone https://github.com/raspberrypi/linux
-git branch 4.4.15 dbf72a4d4531e7e5fb28e76d902d66f05c1bfe12
-git checkout 4.4.15
+git branch 4.4.y cff67c7e03f4333149f2a8f6eafd3bc44475114a
+git checkout 4.4.y
 
 cd linux
 make bcm2709_defconfig
@@ -189,14 +189,19 @@ verzija:
 kernel:
 	custom
 	https://github.com/raspberrypi/linux
-	rpi-4.4.y
-	dbf72a4d4531e7e5fb28e76d902d66f05c1bfe12
+	branch:
+		rpi-4.4.y
+	u trenutku build-a:
+		cff67c7e03f4333149f2a8f6eafd3bc44475114a
 
 preuzimanje najnovije verzije buildroot-a
 	git clone git://git.buildroot.net/buildroot 
 	cd buildroot/
 <Preuzeti konkretnu verziju, najbolje rešenje ukoliko se u koraku konfiguracija koristi priložena .config datoteka>
-	git checkout 2016.08
+	branch:
+		git checkout 2016.08
+	u trenutku build-a:
+		git checkout 484fd99092560a077761327653c25df4b868befd
 	
 konfiguracija
 	opcija 1)
@@ -213,6 +218,7 @@ konfiguracija
 	opcija 2)
 		koristiti patch bootloader/rpi-2-b/src/0001-RPI2-customization-for-RTRK-EMBEDDED-LINUX-PROGRAMMI.patch
 		git apply <patch>
+		make raspberrypi2_defconfig
 
 bildovanje
 	make

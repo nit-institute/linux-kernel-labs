@@ -1,8 +1,12 @@
-From 0241a7a84f2ab1ca5aa5c62a694cd6ed6f7cb7c7 Mon Sep 17 00:00:00 2001
+From c2c264282603d96f27d28c88db7c8e75a7ca3f6c Mon Sep 17 00:00:00 2001
 From: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
 Date: Wed, 3 Aug 2016 14:33:11 +0200
 Subject: [PATCH] RPI2 customization for RTRK EMBEDDED LINUX PROGRAMMING SUMMER
  INTERNSHIP 2016
+
+Signed-off-by: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
+
+new u-boot env file (rpi and server ip addresses changed)
 
 Signed-off-by: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
 ---
@@ -60,53 +64,52 @@ index 7eae14a..c964620 100755
 +
 diff --git a/board/raspberrypi/uboot.env b/board/raspberrypi/uboot.env
 new file mode 100755
-index 0000000000000000000000000000000000000000..da86806b247732a29860e32f7057e2794276def5
+index 0000000000000000000000000000000000000000..a129e2a2dbe7cfb22a551bc75b695e69da41f37c
 GIT binary patch
 literal 16384
-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
-ZfJ49`;1F;KI0PI54grUNL*Rdfz~4bf1IYjY
+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
 
 literal 0
 HcmV?d00001
 
 diff --git a/board/raspberrypi/uboot_env.txt b/board/raspberrypi/uboot_env.txt
 new file mode 100755
-index 0000000..d03fa1a
+index 0000000..7fc84f1
 --- /dev/null
 +++ b/board/raspberrypi/uboot_env.txt
 @@ -0,0 +1,72 @@
@@ -152,7 +155,7 @@ index 0000000..d03fa1a
 +fileaddr=2000000
 +filesize=38e7
 +initrd_high=ffffffff
-+ipaddr=192.168.236.46
++ipaddr=192.168.0.100
 +kernel_addr_r=0x01000000
 +load_efi_dtb=load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${efi_fdtfile}
 +load_zImage=${bootfstype}load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} ${prefix}${zImage_zimagefile}
@@ -171,7 +174,7 @@ index 0000000..d03fa1a
 +scan_dev_for_zImage=setenv zImage_fdtfile ${fdtfile}; setenv zImage_zimagefile ${zimagefile}; if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_zimagefile}; then echo Found ${prefix}${zImage_zimagefile}; run load_zImage; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_fdtfile}; then run load_zImage_dtb; run boot_zImage; fi; done; echo ZIMAGE FAILED: continuing...; fi
 +scriptaddr=0x02000000
 +serial#=00000000489e90a0
-+serverip=192.168.236.104
++serverip=192.168.0.1
 +soc=bcm283x
 +stderr=serial,lcd
 +stdin=serial,usbkbd

@@ -1,4 +1,4 @@
-From c2c264282603d96f27d28c88db7c8e75a7ca3f6c Mon Sep 17 00:00:00 2001
+From 3ec0670a45dd863ba05c9e0ab9534941a0edddc0 Mon Sep 17 00:00:00 2001
 From: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
 Date: Wed, 3 Aug 2016 14:33:11 +0200
 Subject: [PATCH] RPI2 customization for RTRK EMBEDDED LINUX PROGRAMMING SUMMER
@@ -14,8 +14,8 @@ Signed-off-by: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
  board/raspberrypi/post-build.sh             |  22 +++++++++
  board/raspberrypi/uboot.env                 | Bin 0 -> 16384 bytes
  board/raspberrypi/uboot_env.txt             |  72 ++++++++++++++++++++++++++++
- configs/raspberrypi2_defconfig              |  50 +++++++++++--------
- 5 files changed, 126 insertions(+), 20 deletions(-)
+ configs/raspberrypi2_defconfig              |  51 ++++++++++++--------
+ 5 files changed, 127 insertions(+), 20 deletions(-)
  create mode 100755 board/raspberrypi/uboot.env
  create mode 100755 board/raspberrypi/uboot_env.txt
 
@@ -187,10 +187,10 @@ index 0000000..7fc84f1
 +zimagefile=zImage
 \ No newline at end of file
 diff --git a/configs/raspberrypi2_defconfig b/configs/raspberrypi2_defconfig
-index e45a970..406e916 100644
+index e45a970..e7de2f5 100644
 --- a/configs/raspberrypi2_defconfig
 +++ b/configs/raspberrypi2_defconfig
-@@ -1,36 +1,46 @@
+@@ -1,36 +1,47 @@
  BR2_arm=y
  BR2_cortex_a7=y
 -BR2_ARM_EABIHF=y
@@ -235,6 +235,7 @@ index e45a970..406e916 100644
  # BR2_PACKAGE_RPI_FIRMWARE_INSTALL_DTB_OVERLAYS is not set
 -
 -# Required tools to create the SD image
++BR2_PACKAGE_EVTEST=y
 +BR2_PACKAGE_LIBSVG_CAIRO=y
 +BR2_PACKAGE_DTC=y
 +BR2_PACKAGE_DTC_PROGRAMS=y

@@ -35,9 +35,10 @@ sdcard.img - image sd kartice koji je dovoljno naprziti na karticu:
 			v. Kliknite na dugme "Write"
 		b. Linux
 			i. df -h
-			ii. umount /dev/sdd1, ako je sdd1 prikljucena sd kartica
-			iii. dd bs=4M status=progress if=sdcard.img of=/dev/sdd1, ako je sdd1 prikljucena sd kartica, a sdcard.img image koji treba naprziti
-			iv. sudo sync
+			ii. umount /dev/mmcblk0p1, ako je mmcblk0p1 prikljucena sd kartica, particija 1
+			iii. umount /dev/mmcblk0p2, ako je mmcblk0p2 prikljucena sd kartica, particija 2
+			iv. dd bs=4M status=progress if=sdcard.img of=/dev/mmcblk0, ako je sdd1 prikljucena sd kartica, a sdcard.img image koji treba naprziti
+			v. sudo sync
 
 =========================================================================
 Podesavanja za boot preko NFS
@@ -185,23 +186,31 @@ Bildovanje toolchain-a (buildroot)
 Bildovanje kernel-a, rootfs-a i toolchain-a (buildroot)
 =========================================================================
 verzija:
-	2016.08
+	2016.11-rc1
 kernel:
 	custom
 	https://github.com/raspberrypi/linux
 	branch:
 		rpi-4.4.y
 	u trenutku build-a:
-		cff67c7e03f4333149f2a8f6eafd3bc44475114a
+		(4.4.21) 9669a50a3a8e4f33b4fe138277bc4407e1eab9b2
+
+firmware:
+	https://github.com/raspberrypi/firmware
+	u trenutku build-a:
+		(4.4.21 rpi2+) ad8608c08b122b2c228dba0ff5070d6e9519faf5
+
+u-boot:
+	2016.09.01
 
 preuzimanje najnovije verzije buildroot-a
 	git clone git://git.buildroot.net/buildroot 
 	cd buildroot/
 <Preuzeti konkretnu verziju, najbolje rešenje ukoliko se u koraku konfiguracija koristi priložena .config datoteka>
 	branch:
-		git checkout 2016.08
+		git checkout 2016.11-rc1
 	u trenutku build-a:
-		git checkout 484fd99092560a077761327653c25df4b868befd
+		git checkout 7afacefb9c21079645e2ef1bd855aa65e6e6bac9
 	
 konfiguracija
 	opcija 1)

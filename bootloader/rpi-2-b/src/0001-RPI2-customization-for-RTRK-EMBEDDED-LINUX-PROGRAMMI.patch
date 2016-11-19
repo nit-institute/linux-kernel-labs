@@ -1,4 +1,4 @@
-From baf31cdfd751eed64adf97a47fb62df1d9259102 Mon Sep 17 00:00:00 2001
+From 397c72b58031584a65ca4a723ef53705bb1320f7 Mon Sep 17 00:00:00 2001
 From: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
 Date: Fri, 18 Nov 2016 13:08:16 +0100
 Subject: [PATCH] RPI2 customization for RTRK EMBEDDED LINUX PROGRAMMING COURSE
@@ -28,7 +28,7 @@ index 443c821..4cbae1d 100644
      }
    }
 diff --git a/board/raspberrypi/post-build.sh b/board/raspberrypi/post-build.sh
-index 5e5eb71..859b0fa 100755
+index 5e5eb71..0fe1ed0 100755
 --- a/board/raspberrypi/post-build.sh
 +++ b/board/raspberrypi/post-build.sh
 @@ -9,3 +9,25 @@ if [ -e ${TARGET_DIR}/etc/inittab ]; then
@@ -37,7 +37,7 @@ index 5e5eb71..859b0fa 100755
  fi
 +
 +# Change config.txt to boot u-boot.bin instead of zImage
-+sed -ie '/.*kernel=.*/c\
++sed -i -e '/.*kernel=.*/c\
 +kernel=u-boot.bin\ninit_uart_clock=3000000\ninit_uart_baud=115200' ${BINARIES_DIR}/rpi-firmware/config.txt
 +
 +# Change profile to print path

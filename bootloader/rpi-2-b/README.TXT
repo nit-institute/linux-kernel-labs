@@ -138,7 +138,7 @@ src/rootfs/ - minimalni rootfs (busybox)
 Bildovanje kernela
 =========================================================================
 git clone https://github.com/raspberrypi/linux
-git branch 4.4.y cff67c7e03f4333149f2a8f6eafd3bc44475114a
+git branch 4.4.y 9669a50a3a8e4f33b4fe138277bc4407e1eab9b2
 git checkout 4.4.y
 
 cd linux
@@ -150,8 +150,11 @@ Bildovanje minimalnog rootfs-a
 =========================================================================
 wget http://www.busybox.net/downloads/busybox-1.21.1.tar.bz2
 tar xvjf busybox-1.21.1.tar.bz2 <direktorijum gde ce biti raspakovano>
-make defconfig
-make menuconfig (build with static libraries, install directory nfsroot)
+opcija 1:
+    make defconfig
+    make menuconfig (build with static libraries, install directory nfsroot)
+opcija 2:
+    iskoristiti busybox-1.21.1.config
 make
 make install
 
@@ -160,10 +163,20 @@ U etc/ folderu napraviti fajl inittab i popuniti ga sa
 ::sysinit:/etc/init.d/rcS
 ::askfirst:/bin/sh
 
+da bi se izbegla greska "/bin/sh: can't access tty; job control turned off"
+treba pisati ttyAMA0::askfirst:/bin/sh, ali tada mora da postoji /dev
+sa console i ttyAMA0, kao sto mora i za slucaj da se radi sa initramfs
+mkdev dev/console c 5 1
+mkdev dev/ttyAMA0 c 204 64
+
 U etc/init.d/ folderu napraviti fajl rcS i popuniti ga sa
 #!/bin/sh
 mount -t proc none /proc
 mount -t sysfs none /sys
+
+za initramfs, u rfs treba preimenovati linuxrc u init i
+CONFIG_INITRAMFS_SOURCE postaviti na putanju do napravljenog rfs u
+bootargs treba postaviti samo parametre rw i console(=ttyAMA0)
 
 =========================================================================
 Bildovanje u-boot-a

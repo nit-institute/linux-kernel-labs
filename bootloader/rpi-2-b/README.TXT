@@ -245,4 +245,14 @@ konfiguracija
 bildovanje
 	make
 
-
+=========================================================================
+koriscenje usb2serial za konzolu
+=========================================================================
+1) u kernelu ukljciti staticki
+    CONFIG_USB_SERIAL=y
+    CONFIG_USB_SERIAL_CONSOLE=y
+    CONFIG_USB_SERIAL_PL2303=y
+2) u /etc/inittab dodati (ili zameniti postojeci ttyAMA0)
+    /dev/ttyUSB0::respawn:/sbin/getty -L  /dev/ttyUSB0 115200 vt100 # USB_SERIAL
+3) u bootargs
+    console = ttyUSB0,115200

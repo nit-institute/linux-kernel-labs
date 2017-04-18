@@ -1,21 +1,21 @@
-From 397c72b58031584a65ca4a723ef53705bb1320f7 Mon Sep 17 00:00:00 2001
+From e519667a64eb514902aadfa2209bcef0b0fd7127 Mon Sep 17 00:00:00 2001
 From: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
-Date: Fri, 18 Nov 2016 13:08:16 +0100
+Date: Tue, 18 Apr 2017 01:08:39 +0200
 Subject: [PATCH] RPI2 customization for RTRK EMBEDDED LINUX PROGRAMMING COURSE
 
 Signed-off-by: Vladimir Marinkovic <Vladimir.Marinkovic@rt-rk.com>
 ---
  board/raspberrypi/genimage-raspberrypi2.cfg |   2 +
- board/raspberrypi/post-build.sh             |  22 +++++++++
+ board/raspberrypi/post-build.sh             |  27 +++++++++++
  board/raspberrypi/uboot.env                 | Bin 0 -> 16384 bytes
  board/raspberrypi/uboot_env.txt             |  72 ++++++++++++++++++++++++++++
  configs/raspberrypi2_defconfig              |  47 ++++++++++--------
- 5 files changed, 124 insertions(+), 19 deletions(-)
+ 5 files changed, 129 insertions(+), 19 deletions(-)
  create mode 100755 board/raspberrypi/uboot.env
  create mode 100755 board/raspberrypi/uboot_env.txt
 
 diff --git a/board/raspberrypi/genimage-raspberrypi2.cfg b/board/raspberrypi/genimage-raspberrypi2.cfg
-index 443c821..4cbae1d 100644
+index a3be2a3..349ff69 100644
 --- a/board/raspberrypi/genimage-raspberrypi2.cfg
 +++ b/board/raspberrypi/genimage-raspberrypi2.cfg
 @@ -7,6 +7,8 @@ image boot.vfat {
@@ -24,21 +24,26 @@ index 443c821..4cbae1d 100644
        "rpi-firmware/start.elf",
 +      "u-boot.bin",
 +      "uboot.env",
-       "kernel-marked/zImage"
+       "zImage"
      }
    }
 diff --git a/board/raspberrypi/post-build.sh b/board/raspberrypi/post-build.sh
-index 5e5eb71..0fe1ed0 100755
+index 5e5eb71..9244c64 100755
 --- a/board/raspberrypi/post-build.sh
 +++ b/board/raspberrypi/post-build.sh
-@@ -9,3 +9,25 @@ if [ -e ${TARGET_DIR}/etc/inittab ]; then
+@@ -9,3 +9,30 @@ if [ -e ${TARGET_DIR}/etc/inittab ]; then
  	sed -i '/GENERIC_SERIAL/a\
  tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console' ${TARGET_DIR}/etc/inittab
  fi
 +
 +# Change config.txt to boot u-boot.bin instead of zImage
 +sed -i -e '/.*kernel=.*/c\
-+kernel=u-boot.bin\ninit_uart_clock=3000000\ninit_uart_baud=115200' ${BINARIES_DIR}/rpi-firmware/config.txt
++kernel=u-boot.bin' ${BINARIES_DIR}/rpi-firmware/config.txt
++# Replace previous line with the following one in order to change uart0 clock and baud
++# (used as workarround with previous linux kernel versions when DTS was using 3MHz clock
++# and firmware overriden it to 48MHz as the new firmware realy sets uart0 clock to 48MHz,
++# but overriding was not working through u-boot. now it is set in DTS to 48MHz)
++#kernel=u-boot.bin\ninit_uart_clock=3000000\ninit_uart_baud=115200' ${BINARIES_DIR}/rpi-firmware/config.txt
 +
 +# Change profile to print path
 +sed -i '/export PS1='"'"'\# '"'"'.*/c\
@@ -59,52 +64,53 @@ index 5e5eb71..0fe1ed0 100755
 +
 diff --git a/board/raspberrypi/uboot.env b/board/raspberrypi/uboot.env
 new file mode 100755
-index 0000000000000000000000000000000000000000..a129e2a2dbe7cfb22a551bc75b695e69da41f37c
+index 0000000000000000000000000000000000000000..84bf164e4f5eebdb611e02e4cc4b5154d09a1e18
 GIT binary patch
 literal 16384
-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
+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
+K90LCz1pWfv5BMek
 
 literal 0
 HcmV?d00001
 
 diff --git a/board/raspberrypi/uboot_env.txt b/board/raspberrypi/uboot_env.txt
 new file mode 100755
-index 0000000..7fc84f1
+index 0000000..aa45497
 --- /dev/null
 +++ b/board/raspberrypi/uboot_env.txt
 @@ -0,0 +1,72 @@
@@ -123,9 +129,9 @@ index 0000000..7fc84f1
 +boot_scripts=boot.scr.uimg boot.scr
 +boot_targets=eth mmc0
 +boot_zImage=if fdt addr ${fdt_addr_r}; then bootz ${kernel_addr_r} - ${fdt_addr_r}; fi
-+bootargs=root=/dev/nfs rw ip=192.168.236.46 console=ttyAMA0 nfsroot=192.168.236.104:/home/rtrk/Documents/letnja_praksa/2016/Linux1/linux-kernel-labs/modules/nfsroot
++bootargs=root=/dev/nfs rw ip=192.168.236.46 console=ttyAMA0,115200 nfsroot=192.168.236.104:/home/rtrk/Documents/letnja_praksa/2016/Linux1/linux-kernel-labs/modules/nfsroot
 +bootargs_mmc=setenv bootargs root=/dev/mmcblk0p2 rootwait console=tty1 console=ttyAMA0,115200
-+bootargs_nfs=setenv bootargs root=/dev/nfs rw ip=${ipaddr} console=ttyAMA0 nfsroot=${serverip}:${nfsroot_path}
++bootargs_nfs=setenv bootargs root=/dev/nfs rw ip=${ipaddr} console=ttyAMA0,115200 nfsroot=${serverip}:${nfsroot_path}
 +bootcmd=run distro_bootcmd
 +bootcmd_dhcp=run boot_net_usb_start; if dhcp ${scriptaddr} ${boot_script_dhcp}; then source ${scriptaddr}; fi;setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; setenv efi_old_vci ${bootp_vci};setenv efi_old_arch ${bootp_arch};setenv bootp_vci PXEClient:Arch:00010:UNDI:003000;setenv bootp_arch 0xa;if dhcp ${kernel_addr_r}; then tftpboot ${fdt_addr_r} dtb/${efi_fdtfile};if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r}; else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi;fi;setenv bootp_vci ${efi_old_vci};setenv bootp_arch ${efi_old_arch};setenv efi_fdtfile;setenv efi_old_arch;setenv efi_old_vci;
 +bootcmd_eth=run eth_boot
@@ -180,9 +186,8 @@ index 0000000..7fc84f1
 +usbethaddr=b8:27:eb:9e:90:a0
 +vendor=raspberrypi
 +zimagefile=zImage
-\ No newline at end of file
 diff --git a/configs/raspberrypi2_defconfig b/configs/raspberrypi2_defconfig
-index dd2bf8b..28459b2 100644
+index 1ec92e7..f61c6b3 100644
 --- a/configs/raspberrypi2_defconfig
 +++ b/configs/raspberrypi2_defconfig
 @@ -1,36 +1,45 @@
@@ -215,7 +220,7 @@ index dd2bf8b..28459b2 100644
  BR2_LINUX_KERNEL=y
  BR2_LINUX_KERNEL_CUSTOM_GIT=y
  BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/raspberrypi/linux.git"
- BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="9669a50a3a8e4f33b4fe138277bc4407e1eab9b2"
+ BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="1ebe8d4a4c96cd6a90805c74233a468854960f67"
  BR2_LINUX_KERNEL_DEFCONFIG="bcm2709"
 -
 -# Build the DTB from the kernel sources

@@ -1,10 +1,10 @@
 diff -Nurp linux_clean/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig linux_patch/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig
 --- linux_clean/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig	1970-01-01 01:00:00.000000000 +0100
 +++ linux_patch/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig	2016-08-02 08:22:46.905892655 +0200
-@@ -0,0 +1,1350 @@
+@@ -0,0 +1,1346 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
-+# Linux/arm 4.4.16 Kernel Configuration
++# Linux/arm 4.4.43 Kernel Configuration
 +#
 +CONFIG_ARM=y
 +CONFIG_SYS_SUPPORTS_APM_EMULATION=y
@@ -72,7 +72,6 @@ diff -Nurp linux_clean/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig linux_
 +#
 +CONFIG_HZ_PERIODIC=y
 +# CONFIG_NO_HZ_IDLE is not set
-+# CONFIG_NO_HZ_FULL is not set
 +# CONFIG_NO_HZ is not set
 +# CONFIG_HIGH_RES_TIMERS is not set
 +
@@ -186,9 +185,6 @@ diff -Nurp linux_clean/arch/arm/configs/bcm2709_rtrk_linux_kurs_defconfig linux_
 +CONFIG_BASE_SMALL=1
 +# CONFIG_MODULES is not set
 +# CONFIG_BLOCK is not set
-+# CONFIG_DEFAULT_DEADLINE is not set
-+# CONFIG_DEFAULT_CFQ is not set
-+# CONFIG_DEFAULT_NOOP is not set
 +CONFIG_INLINE_SPIN_UNLOCK_IRQ=y
 +CONFIG_INLINE_READ_UNLOCK=y
 +CONFIG_INLINE_READ_UNLOCK_IRQ=y

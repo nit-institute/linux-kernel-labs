@@ -5,8 +5,6 @@
 # and http://elinux.org/RPiconfig for a description of config.txt syntax
 
 kernel=u-boot.bin
-init_uart_clock=3000000
-init_uart_baud=115200
 
 # To use an external initramfs file
 #initramfs rootfs.cpio.gz

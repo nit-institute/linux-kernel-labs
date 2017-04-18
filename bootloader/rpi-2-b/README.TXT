@@ -137,8 +137,8 @@ src/rootfs/ - minimalni rootfs (busybox)
 =========================================================================
 Bildovanje kernela
 =========================================================================
-git clone https://github.com/raspberrypi/linux
-git branch 4.4.y 9669a50a3a8e4f33b4fe138277bc4407e1eab9b2
+git clone -b rpi-4.4.y --single-branch https://github.com/raspberrypi/linux
+git branch 4.4.y 1ebe8d4a4c96cd6a90805c74233a468854960f67
 git checkout 4.4.y
 
 cd linux
@@ -198,32 +198,36 @@ Bildovanje toolchain-a (buildroot)
 =========================================================================
 Bildovanje kernel-a, rootfs-a i toolchain-a (buildroot)
 =========================================================================
+prereq:
+	sudo apt-get install device-tree-compiler
+
 verzija:
-	2016.11-rc1
+	2017.02.1
+
 kernel:
 	custom
 	https://github.com/raspberrypi/linux
 	branch:
 		rpi-4.4.y
 	u trenutku build-a:
-		(4.4.21) 9669a50a3a8e4f33b4fe138277bc4407e1eab9b2
+		(4.4.43) 1ebe8d4a4c96cd6a90805c74233a468854960f67
 
 firmware:
 	https://github.com/raspberrypi/firmware
 	u trenutku build-a:
-		(4.4.21 rpi2+) ad8608c08b122b2c228dba0ff5070d6e9519faf5
+		(4.4.43 rpi2+) 7f8ac8dac0b80291cbf5e56580139034a0a42070
 
 u-boot:
-	2016.09.01
+	2017.01
 
 preuzimanje najnovije verzije buildroot-a
 	git clone git://git.buildroot.net/buildroot 
 	cd buildroot/
 <Preuzeti konkretnu verziju, najbolje rešenje ukoliko se u koraku konfiguracija koristi priložena .config datoteka>
 	branch:
-		git checkout 2016.11-rc1
+		git checkout 2017.02.1
 	u trenutku build-a:
-		git checkout 7afacefb9c21079645e2ef1bd855aa65e6e6bac9
+		git checkout 476067a78d4fd1ddb141a8cccc63cf3e75cbe7a3
 	
 konfiguracija
 	opcija 1)
@@ -232,7 +236,7 @@ konfiguracija
 			make xconfig
 			...
 		opcija b) kopirati priloženu datoteku kao .config u buildroot/
-			modules/data/buildroot-2016.08-all.config
+			modules/data/buildroot-2017.02.1-all.config
 
 		<Uključivanje u-boot.bin u sdcard.img i dodatne datoteke>
 			post-build.sh

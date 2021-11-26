@@ -137,9 +137,17 @@ src/rootfs/ - minimalni rootfs (busybox)
 =========================================================================
 Bildovanje kernela
 =========================================================================
-git clone -b rpi-4.4.y --single-branch https://github.com/raspberrypi/linux
-git branch 4.4.y 1ebe8d4a4c96cd6a90805c74233a468854960f67
-git checkout 4.4.y
+prereq:
+	sudo apt-get install flex
+	sudo apt-get install bison
+	sudo apt-get install libssl-dev
+	sudo apt-get install qtbase5-dev
+	sudo apt-get install g++
+
+git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux
+ --depth=1
+git branch 5.10.y 581049d718caf95f5feb00607ac748d5841cf27c
+git checkout 5.10.y
 
 cd linux
 make bcm2709_defconfig
@@ -148,13 +156,13 @@ make
 =========================================================================
 Bildovanje minimalnog rootfs-a
 =========================================================================
-wget http://www.busybox.net/downloads/busybox-1.21.1.tar.bz2
-tar xvjf busybox-1.21.1.tar.bz2 <direktorijum gde ce biti raspakovano>
+wget http://www.busybox.net/downloads/busybox-1.33.1.tar.bz2
+tar xvjf busybox-1.33.1.tar.bz2 <direktorijum gde ce biti raspakovano>
 opcija 1:
     make defconfig
     make menuconfig (build with static libraries, install directory nfsroot)
 opcija 2:
-    iskoristiti busybox-1.21.1.config
+    iskoristiti busybox-1.33.1.config
 make
 make install
 
@@ -166,8 +174,8 @@ U etc/ folderu napraviti fajl inittab i popuniti ga sa
 da bi se izbegla greska "/bin/sh: can't access tty; job control turned off"
 treba pisati ttyAMA0::askfirst:/bin/sh, ali tada mora da postoji /dev
 sa console i ttyAMA0, kao sto mora i za slucaj da se radi sa initramfs
-mkdev dev/console c 5 1
-mkdev dev/ttyAMA0 c 204 64
+mknod dev/console c 5 1
+mknod dev/ttyAMA0 c 204 64
 
 U etc/init.d/ folderu napraviti fajl rcS i popuniti ga sa
 #!/bin/sh
@@ -184,6 +192,10 @@ Bildovanje u-boot-a
 git clone git://git.denx.de/u-boot.git
 make rpi_2_defconfig
 make all
+	branch:
+		v2021.07
+	u trenutku build-a:
+		(2021.07) 840658b093976390e9537724f802281c9c8439f5
 
 =========================================================================
 Bildovanje rootfs (buildroot)
@@ -202,32 +214,33 @@ prereq:
 	sudo apt-get install device-tree-compiler
 
 verzija:
-	2017.02.1
+	2021.08.x
 
 kernel:
 	custom
 	https://github.com/raspberrypi/linux
 	branch:
-		rpi-4.4.y
+		rpi-5.10.y
 	u trenutku build-a:
-		(4.4.43) 1ebe8d4a4c96cd6a90805c74233a468854960f67
+		(5.10.76) 581049d718caf95f5feb00607ac748d5841cf27c
 
 firmware:
 	https://github.com/raspberrypi/firmware
 	u trenutku build-a:
-		(4.4.43 rpi2+) 7f8ac8dac0b80291cbf5e56580139034a0a42070
+		(5.10.50 rpi2+) 33e09977ff3b02967d191801e3361224455acb9d
+		(5.10.75 rpi2+) 8db7ef815b849a8a7cdd8e4cd14f41a07b0b0288
 
 u-boot:
-	2017.01
+	2021.07
 
 preuzimanje najnovije verzije buildroot-a
 	git clone git://git.buildroot.net/buildroot 
 	cd buildroot/
 <Preuzeti konkretnu verziju, najbolje rešenje ukoliko se u koraku konfiguracija koristi priložena .config datoteka>
 	branch:
-		git checkout 2017.02.1
+		git checkout 2021.08.x
 	u trenutku build-a:
-		git checkout 476067a78d4fd1ddb141a8cccc63cf3e75cbe7a3
+		git checkout 4eea95a98980373633c603520b3966b40345171f
 	
 konfiguracija
 	opcija 1)
@@ -241,8 +254,9 @@ konfiguracija
 		<Uključivanje u-boot.bin u sdcard.img i dodatne datoteke>
 			post-build.sh
 			genimage-raspberrypi2.cfg
+			uboot.env
 	opcija 2)
-		koristiti patch bootloader/rpi-2-b/src/0001-RPI2-customization-for-RTRK-EMBEDDED-LINUX-PROGRAMMI.patch
+		koristiti patch bootloader/rpi-2-b/src/0001-RPI2-customization-for-EMBEDDED-LINUX-course.patch
 		git apply <patch>
 		make raspberrypi2_defconfig
 

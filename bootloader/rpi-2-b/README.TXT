@@ -249,7 +249,7 @@ konfiguracija
 			make xconfig
 			...
 		opcija b) kopirati priloženu datoteku kao .config u buildroot/
-			modules/data/buildroot-2017.02.1-all.config
+			modules/data/buildroot-2021.08-all.config
 
 		<Uključivanje u-boot.bin u sdcard.img i dodatne datoteke>
 			post-build.sh
@@ -257,6 +257,8 @@ konfiguracija
 			uboot.env
 	opcija 2)
 		koristiti patch bootloader/rpi-2-b/src/0001-RPI2-customization-for-EMBEDDED-LINUX-course.patch
+		ako je potrebno generisati uboot.env od tekstualnog uboot_env.txt:
+			../../../u-boot/tools/mkenvimage -s 0x4000 -p 0x00 -o uboot.env uboot_env.txt
 		git apply <patch>
 		make raspberrypi2_defconfig
 

@@ -41,7 +41,7 @@ sdcard.img - image sd kartice koji je dovoljno naprziti na karticu:
 			v. sudo sync
 
 =========================================================================
-Podesavanja za boot preko NFS
+Podesavanja za boot preko NFS (OUTDATED PATHS)
 =========================================================================
 u u-boot folderu se nalazi:
 	u-boot.bin / image u-boot-a, da bi se pokrenuo treba ga kopirati na sd karticu rpi-a na boot particiju i u config.txt fajlu dodati liniju "kernel=u-boot.bin"
@@ -146,7 +146,7 @@ prereq:
 
 git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux
  --depth=1
-git branch 5.10.y 581049d718caf95f5feb00607ac748d5841cf27c
+git branch 5.10.y 8e1110a580887f4b82303b9354c25d7e2ff5860e
 git checkout 5.10.y
 
 cd linux
@@ -222,13 +222,14 @@ kernel:
 	branch:
 		rpi-5.10.y
 	u trenutku build-a:
-		(5.10.76) 581049d718caf95f5feb00607ac748d5841cf27c
+		(5.10.110) 8e1110a580887f4b82303b9354c25d7e2ff5860e
 
 firmware:
 	https://github.com/raspberrypi/firmware
 	u trenutku build-a:
 		(5.10.50 rpi2+) 33e09977ff3b02967d191801e3361224455acb9d
 		(5.10.75 rpi2+) 8db7ef815b849a8a7cdd8e4cd14f41a07b0b0288
+		(5.10.95 rpi2+) 6159b7c1195b41aa43b0d2f322e192d84845e622
 
 u-boot:
 	2021.07
@@ -257,13 +258,46 @@ konfiguracija
 			uboot.env
 	opcija 2)
 		koristiti patch bootloader/rpi-2-b/src/0001-RPI2-customization-for-EMBEDDED-LINUX-course.patch
-		ako je potrebno generisati uboot.env od tekstualnog uboot_env.txt:
+		ako je potrebno generisati uboot.env od tekstualnog uboot_env.txt (prethodno je potrebno preuzimanje i bildovanje u-boot-a, vidi gore):
 			../../../u-boot/tools/mkenvimage -s 0x4000 -p 0x00 -o uboot.env uboot_env.txt
 		git apply <patch>
 		make raspberrypi2_defconfig
 
 bildovanje
 	make
+
+Osvezavanje dobijenih datoteka na linux-kernel-labs repozitorijumu:
+	1) README.txt
+		osvezavanje podataka u ovoj datoteci
+	2) patch
+		dodati sve datoteke koje su izmenjene (git add zeljene datoteke, ostale datoteke najbolje ukloniti da ne bismo imali dirty konfiguraciju. i make config i make, tj. build, najbolje je raditi nakon commita koji sledi da ne bi bio bildovan sa dirty konfiguracijom)
+		napraviti novi commit (git commit -m "RPI2 customization for EMBEDDED LINUX course")
+		napraviti novi patch (git format-patch HEAD~1)
+		prekopirati novi patch na putanju bootloader/rpi-2-b/src/0001-RPI2-customization-for-EMBEDDED-LINUX-course.patch
+	3) .config
+		prekopirati .config na putanju modules/data/ pod imenom u skladu sa verzijom, npr. cp .config ../../modules/data/buildroot-2021.08-all.config
+	4) images (po zelji, ukoliko je promenjena neka od datoteka ispod) 
+		bcm2709-rpi-2-b.dtb
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+		boot.vfat
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+		rootfs.ext2
+			zapakovati u ~/linux-kernel-labs/bootloader/rpi-2-b/rootfs.ext2.tar.bz2
+			tar cvfj ~/linux-kernel-labs/bootloader/rpi-2-b/rootfs.ext2.tar.bz2 rootfs.ext2
+		rpi-firmware/
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+		sdcard.img
+			zapakovati u ~/linux-kernel-labs/bootloader/rpi-2-b/sdcard.img.tar.bz2
+			tar cvfj ~/linux-kernel-labs/bootloader/rpi-2-b/sdcard.img.tar.bz2 sdcard.img
+		u-boot.bin
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+		uboot.env*
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+		zImage
+			kopirati u ~/linux-kernel-labs/bootloader/rpi-2-b
+	5) RFS
+		mountovati rootfs.ext2 na neki direktorijum, npr. sudo mount rootfs.ext2 ~/linux-kernel-labs/modules/nfsroot/
+		zapakovati sve datoteke iz mountovanog RFS u ~/linux-kernel-labs/modules/rootfs.tar.bz2, npr. sudo tar cvfj ../rootfs.tar.bz2 ./*
 
 =========================================================================
 koriscenje usb2serial za konzolu

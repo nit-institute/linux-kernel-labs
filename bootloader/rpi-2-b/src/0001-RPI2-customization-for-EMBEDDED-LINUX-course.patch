@@ -1,6 +1,6 @@
-From f1effda142972cfaa9d3dd35538b5b26e06373e7 Mon Sep 17 00:00:00 2001
+From 936585c225bfca310e9e1411ba021fd5827014af Mon Sep 17 00:00:00 2001
 From: Vladimir Marinkovic <Vladimir.Marinkovic@nit-institute.com>
-Date: Wed, 16 Mar 2022 09:10:22 +0100
+Date: Wed, 16 Nov 2022 22:01:19 +0100
 Subject: [PATCH] RPI2 customization for EMBEDDED LINUX course
 
 ---
@@ -189,7 +189,7 @@ index 0000000000..5d8b632076
 +vendor=raspberrypi
 +zimagefile=zImage
 diff --git a/configs/raspberrypi2_defconfig b/configs/raspberrypi2_defconfig
-index 1eee3ae37e..4c0eb07e69 100644
+index 1eee3ae37e..64d1c5a902 100644
 --- a/configs/raspberrypi2_defconfig
 +++ b/configs/raspberrypi2_defconfig
 @@ -2,17 +2,27 @@ BR2_arm=y
@@ -220,7 +220,7 @@ index 1eee3ae37e..4c0eb07e69 100644
 -BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,raspberrypi,linux,4afd064509b23882268922824edc5b391a1ea55d)/linux-4afd064509b23882268922824edc5b391a1ea55d.tar.gz"
 +BR2_LINUX_KERNEL_CUSTOM_GIT=y
 +BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/raspberrypi/linux.git"
-+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="581049d718caf95f5feb00607ac748d5841cf27c"
++BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="8e1110a580887f4b82303b9354c25d7e2ff5860e"
  BR2_LINUX_KERNEL_DEFCONFIG="bcm2709"
  
  # Build the DTB from the kernel sources
@@ -249,5 +249,5 @@ index 1eee3ae37e..4c0eb07e69 100644
  BR2_PACKAGE_HOST_GENIMAGE=y
  BR2_PACKAGE_HOST_MTOOLS=y
 -- 
-2.30.2
+2.25.1
 

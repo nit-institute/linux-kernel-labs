@@ -78,9 +78,6 @@ static const struct file_operations timer_fops = {
 static int timer_probe(struct platform_device *pdev)
 {
 
-	/* Enable power management */
-
-
 	/* read timer freq */
 
 
@@ -112,13 +109,13 @@ static int timer_remove(struct platform_device *pdev)
 }
 
 static struct of_device_id timer_dt_match[] = {
-	{ .compatible = "rtrk,timer" },
+	{ .compatible = "linux,timer" },
 	{ },
 };
 
 static struct platform_driver timer_driver = {
 	.driver = {
-		.name = "timer",
+		.name = "linuxtimer",
 		.owner = THIS_MODULE,
 		.of_match_table = of_match_ptr(timer_dt_match),
 	},

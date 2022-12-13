@@ -39,6 +39,10 @@ sdcard.img - image sd kartice koji je dovoljno naprziti na karticu:
 			iii. umount /dev/mmcblk0p2, ako je mmcblk0p2 prikljucena sd kartica, particija 2
 			iv. dd bs=4M status=progress if=sdcard.img of=/dev/mmcblk0, ako je sdd1 prikljucena sd kartica, a sdcard.img image koji treba naprziti
 			v. sudo sync
+		c. rpi
+			tftp 0x01000000 sdcard.img
+			tftp 0x02000000 uboot.env
+			mmc rescan; mmc erase 0x0 0x4c002; mmc write 0x01000000 0x0 0x4C002; ls mmc 0:1; ls mmc 0:2; fatwrite mmc 0:1 0x02000000 uboot.env $filesize
 
 =========================================================================
 Podesavanja za boot preko NFS (OUTDATED PATHS)
@@ -144,10 +148,9 @@ prereq:
 	sudo apt-get install qtbase5-dev
 	sudo apt-get install g++
 
-git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux
- --depth=1
+git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux --depth=1
 git branch 5.10.y 8e1110a580887f4b82303b9354c25d7e2ff5860e
-git checkout 5.10.y
+git checkout 5.10.y.
 
 cd linux
 make bcm2709_defconfig

@@ -1,0 +1,175 @@
+From 298816b808dde23851ee08aa850ac94cda60add6 Mon Sep 17 00:00:00 2001
+From: Milica Matic <milica.matic@rt-rk.com>
+Date: Tue, 27 Feb 2024 08:10:12 +0100
+Subject: [PATCH] RPI4 customization for EMBEDDED LINUX course
+
+---
+ board/raspberrypi/genimage.cfg.in |   4 ++-
+ board/raspberrypi/post-build.sh   |  29 ++++++++++++++++
+ board/raspberrypi/uboot.env       | Bin 0 -> 16384 bytes
+ board/raspberrypi/uboot_env.txt   |  56 ++++++++++++++++++++++++++++++
+ 4 files changed, 88 insertions(+), 1 deletion(-)
+ create mode 100755 board/raspberrypi/uboot.env
+ create mode 100644 board/raspberrypi/uboot_env.txt
+
+diff --git a/board/raspberrypi/genimage.cfg.in b/board/raspberrypi/genimage.cfg.in
+index fd38b86a0c..e64547f9e8 100644
+--- a/board/raspberrypi/genimage.cfg.in
++++ b/board/raspberrypi/genimage.cfg.in
+@@ -1,7 +1,9 @@
+ image boot.vfat {
+ 	vfat {
+ 		files = {
+-#BOOT_FILES#
++			"uboot.env",
++			"zImage",
++			#BOOT_FILES#
+ 		}
+ 	}
+ 
+diff --git a/board/raspberrypi/post-build.sh b/board/raspberrypi/post-build.sh
+index 73026e5922..7e2c83b536 100755
+--- a/board/raspberrypi/post-build.sh
++++ b/board/raspberrypi/post-build.sh
+@@ -14,3 +14,32 @@ elif [ -d ${TARGET_DIR}/etc/systemd ]; then
+     ln -sf /lib/systemd/system/getty@.service \
+        "${TARGET_DIR}/etc/systemd/system/getty.target.wants/getty@tty1.service"
+ fi
++
++# Change config.txt to boot u-boot.bin instead of zImage
++sed -i -e '/.*kernel=.*/c\
++kernel=u-boot.bin' ${BINARIES_DIR}/rpi-firmware/config.txt
++
++# uncomment following lines to
++# add disabling bt overlay to config.txt
++#cat << EOF > ${BINARIES_DIR}/rpi-firmware/config.txt
++# Disable bluetooth so we can user serial console
++#dtoverlay=disable-bt
++#EOF
++
++# Change profile to print path
++sed -i '/export PS1='"'"'\# '"'"'.*/c\
++		export PS1="\\\`if \[\[ \\\$? = "0" ]]; then echo '"'"'\\e\[32m\\h\\e\[0m'"'"'; else echo '"'"'\\e\[31m\\h\\e\[0m'"'"' ; fi\\\`:\\\w\\\# "' ${TARGET_DIR}/etc/profile
++
++sed -i '/export PS1='"'"'\$ '"'"'.*/c\
++		export PS1="\\\`if \[\[ \\\$? = "0" ]]; then echo '"'"'\\e\[32m\\h\\e\[0m'"'"'; else echo '"'"'\\e\[31m\\h\\e\[0m'"'"' ; fi\\\`:\\\w\\\$ "' ${TARGET_DIR}/etc/profile
++
++# Change sshd_config for SSH server
++sed -i '/.*PermitRootLogin.*/c\
++PermitRootLogin yes' ${TARGET_DIR}/etc/ssh/sshd_config
++
++sed -i '/.*PermitEmptyPasswords.*/c\
++PermitEmptyPasswords yes' ${TARGET_DIR}/etc/ssh/sshd_config
++
++# Copy u-boot environment image to output/images dir
++cp -f board/raspberrypi/uboot.env ${BINARIES_DIR}/
++
+diff --git a/board/raspberrypi/uboot.env b/board/raspberrypi/uboot.env
+new file mode 100755
+index 0000000000000000000000000000000000000000..e5d2a3cdc50e492dcbcf274ca4667a9f20b46291
+GIT binary patch
+literal 16384
+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
+O90Cpjhrs_7f&T!06UG<-
+
+literal 0
+HcmV?d00001
+
+diff --git a/board/raspberrypi/uboot_env.txt b/board/raspberrypi/uboot_env.txt
+new file mode 100644
+index 0000000000..6a7fbbfcd5
+--- /dev/null
++++ b/board/raspberrypi/uboot_env.txt
+@@ -0,0 +1,56 @@
++boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
++boot_efi_binary=load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} efi/boot/bootarm.efi; if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r};else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi
++boot_extlinux=sysboot ${devtype} ${devnum}:${distro_bootpart} any ${scriptaddr} ${prefix}extlinux/extlinux.conf
++boot_net_usb_start=usb start
++boot_prefixes=/ /boot/
++boot_script_dhcp=boot.scr.uimg
++boot_scripts=boot.scr.uimg boot.scr
++boot_targets=eth mmc0
++boot_zImage=if fdt addr ${fdt_addr_r}; then run disable_bt; bootz ${kernel_addr_r} - ${fdt_addr_r}; fi
++bootargs=root=/dev/mmcblk0p2 rootwait console=tty1 console=ttyAMA0,115200
++bootargs_mmc=setenv bootargs root=/dev/mmcblk0p2 rootwait console=tty1 console=ttyAMA0,115200
++bootargs_nfs=setenv bootargs root=/dev/nfs rw ip=${ipaddr} console=ttyAMA0,115200 nfsroot=${serverip}:${nfsroot_path},nfsvers=4
++bootcmd=run distro_bootcmd
++bootcmd_dhcp=run boot_net_usb_start; if dhcp ${scriptaddr} ${boot_script_dhcp}; then source ${scriptaddr}; fi;setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; setenv efi_old_vci ${bootp_vci};setenv efi_old_arch ${bootp_arch};setenv bootp_vci PXEClient:Arch:00010:UNDI:003000;setenv bootp_arch 0xa;if dhcp ${kernel_addr_r}; then tftpboot ${fdt_addr_r} dtb/${efi_fdtfile};if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r}; else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi;fi;setenv bootp_vci ${efi_old_vci};setenv bootp_arch ${efi_old_arch};setenv efi_fdtfile;setenv efi_old_arch;setenv efi_old_vci;
++bootcmd_eth=run eth_boot
++bootcmd_mmc0=setenv devnum 0; run mmc_boot
++bootcmd_pxe=run boot_net_usb_start; dhcp; if pxe get; then pxe boot; fi
++bootcmd_usb0=setenv devnum 0; run usb_boot
++bootdelay=3
++bootfstype=fat
++dhcpuboot=usb start; dhcp u-boot.uimg; bootm
++disable_bt=fatload mmc 0:1 ${fdt_ov_addr_r} overlays/disable-bt.dtbo; if fdt addr $fdt_ov_addr_r}; then fdt addr ${fdt_addr_r}; fdt resize 8192; fdt apply ${fdt_ov_addr_r}; fi
++distro_bootcmd=for target in ${boot_targets}; do run bootcmd_${target}; done
++efi_dtb_prefixes=/ /dtb/ /dtb/current/
++eth_boot=run bootargs_nfs; setenv zImage_fdtfile ${fdtfile}; setenv zImage_zimagefile ${zimagefile}; if run tftp_zImage; then if run tftp_zImage_dtb; then run boot_zImage; fi; fi
++load_efi_dtb=load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${efi_fdtfile}
++load_zImage=${bootfstype}load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} ${prefix}${zImage_zimagefile}
++load_zImage_dtb=${bootfstype}load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${zImage_fdtfile}
++mmc_boot=if mmc dev ${devnum}; then run bootargs_mmc; setenv devtype mmc; run scan_dev_for_boot_part; fi
++nfsroot_path=/home/student/linux-kernel-labs/modules/nfsroot
++preboot=usb start
++scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_zImage; run scan_dev_for_extlinux; run scan_dev_for_scripts; done; run scan_dev_for_efi;
++scan_dev_for_boot_part=part list ${devtype} ${devnum} -bootable devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done
++scan_dev_for_efi=setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${efi_fdtfile}; then run load_efi_dtb; fi;done;if test -e ${devtype} ${devnum}:${distro_bootpart} efi/boot/bootarm.efi; then echo Found EFI removable media binary efi/boot/bootarm.efi; run boot_efi_binary; echo EFI LOAD FAILED: continuing...; fi; setenv efi_fdtfile
++scan_dev_for_extlinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}extlinux/extlinux.conf; then echo Found ${prefix}extlinux/extlinux.conf; run boot_extlinux; echo SCRIPT FAILED: continuing...; fi
++scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done
++scan_dev_for_zImage=setenv zImage_fdtfile ${fdtfile}; setenv zImage_zimagefile ${zimagefile}; if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_zimagefile}; then echo Found ${prefix}${zImage_zimagefile}; run load_zImage; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_fdtfile}; then run load_zImage_dtb; run boot_zImage; fi; done; echo ZIMAGE FAILED: continuing...; fi
++tftp_zImage=tftp ${kernel_addr_r} ${zImage_zimagefile}
++tftp_zImage_dtb=tftp ${fdt_addr_r} ${zImage_fdtfile}
++usb_boot=usb start; if usb dev ${devnum}; then setenv devtype usb; run scan_dev_for_boot_part; fi
++stderr=serial,lcd
++stdin=serial,usbkbd
++stdout=serial,lcd
++fdt_addr=2effbf00
++fdt_high=ffffffff
++initrd_high=ffffffff
++kernel_addr_r=0x00080000
++scriptaddr=0x02400000
++pxefile_addr_r=0x02500000
++fdt_addr_r=0x02600000
++fdt_ov_addr_r=0x02620000
++ramdisk_addr_r=0x02700000
++zimagefile=zImage
++fdtfile=bcm2711-rpi-4-b.dtb
++ipaddr=192.168.10.100
++serverip=192.168.10.1
+-- 
+2.34.1
+

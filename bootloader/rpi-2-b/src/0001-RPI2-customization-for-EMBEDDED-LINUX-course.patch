@@ -1,48 +1,51 @@
-From 936585c225bfca310e9e1411ba021fd5827014af Mon Sep 17 00:00:00 2001
-From: Vladimir Marinkovic <Vladimir.Marinkovic@nit-institute.com>
-Date: Wed, 16 Nov 2022 22:01:19 +0100
+From 93c9e613cbf5eb83024e231928a7771c0ed93025 Mon Sep 17 00:00:00 2001
+From: Vladimir Marinkovic <vladimir.marinkovic@nit-institute.com>
+Date: Wed, 28 Feb 2024 19:32:01 +0100
 Subject: [PATCH] RPI2 customization for EMBEDDED LINUX course
 
 ---
- board/raspberrypi/genimage-raspberrypi2.cfg |   2 +
- board/raspberrypi/post-build.sh             |  27 +++++++
- board/raspberrypi/uboot.env                 | Bin 0 -> 16384 bytes
- board/raspberrypi/uboot_env.txt             |  75 ++++++++++++++++++++
- configs/raspberrypi2_defconfig              |  31 ++++++--
- 5 files changed, 131 insertions(+), 4 deletions(-)
+ board/raspberrypi/genimage.cfg.in |   4 ++-
+ board/raspberrypi/post-build.sh   |  29 ++++++++++++++++
+ board/raspberrypi/uboot.env       | Bin 0 -> 16384 bytes
+ board/raspberrypi/uboot_env.txt   |  56 ++++++++++++++++++++++++++++++
+ 4 files changed, 88 insertions(+), 1 deletion(-)
  create mode 100755 board/raspberrypi/uboot.env
  create mode 100644 board/raspberrypi/uboot_env.txt
 
-diff --git a/board/raspberrypi/genimage-raspberrypi2.cfg b/board/raspberrypi/genimage-raspberrypi2.cfg
-index a3be2a3442..349ff69e7c 100644
---- a/board/raspberrypi/genimage-raspberrypi2.cfg
-+++ b/board/raspberrypi/genimage-raspberrypi2.cfg
-@@ -7,6 +7,8 @@ image boot.vfat {
-       "rpi-firmware/config.txt",
-       "rpi-firmware/fixup.dat",
-       "rpi-firmware/start.elf",
-+      "u-boot.bin",
-+      "uboot.env",
-       "zImage"
-     }
-   }
+diff --git a/board/raspberrypi/genimage.cfg.in b/board/raspberrypi/genimage.cfg.in
+index fd38b86a0c..e64547f9e8 100644
+--- a/board/raspberrypi/genimage.cfg.in
++++ b/board/raspberrypi/genimage.cfg.in
+@@ -1,7 +1,9 @@
+ image boot.vfat {
+ 	vfat {
+ 		files = {
+-#BOOT_FILES#
++			"uboot.env",
++			"zImage",
++			#BOOT_FILES#
+ 		}
+ 	}
+ 
 diff --git a/board/raspberrypi/post-build.sh b/board/raspberrypi/post-build.sh
-index 5e5eb71100..9244c64698 100755
+index 73026e5922..7e2c83b536 100755
 --- a/board/raspberrypi/post-build.sh
 +++ b/board/raspberrypi/post-build.sh
-@@ -9,3 +9,30 @@ if [ -e ${TARGET_DIR}/etc/inittab ]; then
- 	sed -i '/GENERIC_SERIAL/a\
- tty1::respawn:/sbin/getty -L  tty1 0 vt100 # HDMI console' ${TARGET_DIR}/etc/inittab
+@@ -14,3 +14,32 @@ elif [ -d ${TARGET_DIR}/etc/systemd ]; then
+     ln -sf /lib/systemd/system/getty@.service \
+        "${TARGET_DIR}/etc/systemd/system/getty.target.wants/getty@tty1.service"
  fi
 +
 +# Change config.txt to boot u-boot.bin instead of zImage
 +sed -i -e '/.*kernel=.*/c\
 +kernel=u-boot.bin' ${BINARIES_DIR}/rpi-firmware/config.txt
-+# Replace previous line with the following one in order to change uart0 clock and baud
-+# (used as workarround with previous linux kernel versions when DTS was using 3MHz clock
-+# and firmware overriden it to 48MHz as the new firmware realy sets uart0 clock to 48MHz,
-+# but overriding was not working through u-boot. now it is set in DTS to 48MHz)
-+#kernel=u-boot.bin\ninit_uart_clock=3000000\ninit_uart_baud=115200' ${BINARIES_DIR}/rpi-firmware/config.txt
++
++# uncomment following lines to
++# add disabling bt overlay to config.txt
++#cat << EOF > ${BINARIES_DIR}/rpi-firmware/config.txt
++# Disable bluetooth so we can user serial console
++#dtoverlay=disable-bt
++#EOF
 +
 +# Change profile to print path
 +sed -i '/export PS1='"'"'\# '"'"'.*/c\
@@ -63,63 +66,54 @@ index 5e5eb71100..9244c64698 100755
 +
 diff --git a/board/raspberrypi/uboot.env b/board/raspberrypi/uboot.env
 new file mode 100755
-index 0000000000000000000000000000000000000000..bdd44177e130174ad9039495de5db50409533f32
+index 0000000000000000000000000000000000000000..e0d2025d446ac1dc66563bf6b1d3c5708eb5d947
 GIT binary patch
 literal 16384
-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
-Z4grUNL%<>65O4@M1RMemf&T*ne*qR{1#<uZ
+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
+M;1F;K{7(`150<CK@&Et;
 
 literal 0
 HcmV?d00001
 
 diff --git a/board/raspberrypi/uboot_env.txt b/board/raspberrypi/uboot_env.txt
 new file mode 100644
-index 0000000000..5d8b632076
+index 0000000000..0f9b9bf753
 --- /dev/null
 +++ b/board/raspberrypi/uboot_env.txt
-@@ -0,0 +1,75 @@
-+arch=arm
-+baudrate=115200
-+board=rpi
-+board_name=2 Model B
-+board_rev=0x4
-+board_rev_scheme=1
-+board_revision=0xA01041
+@@ -0,0 +1,56 @@
 +boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
 +boot_efi_binary=load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} efi/boot/bootarm.efi; if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r};else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi
 +boot_extlinux=sysboot ${devtype} ${devnum}:${distro_bootpart} any ${scriptaddr} ${prefix}extlinux/extlinux.conf
@@ -128,8 +122,8 @@ index 0000000000..5d8b632076
 +boot_script_dhcp=boot.scr.uimg
 +boot_scripts=boot.scr.uimg boot.scr
 +boot_targets=eth mmc0
-+boot_zImage=if fdt addr ${fdt_addr_r}; then bootz ${kernel_addr_r} - ${fdt_addr_r}; fi
-+bootargs=root=/dev/nfs rw ip=192.168.10.100 console=ttyAMA0,115200 nfsroot=192.168.10.1:/home/student/linux-kernel-labs/modules/nfsroot,nfsvers=4
++boot_zImage=if fdt addr ${fdt_addr_r}; then run disable_bt; bootz ${kernel_addr_r} - ${fdt_addr_r}; fi
++bootargs=root=/dev/mmcblk0p2 rootwait console=tty1 console=ttyAMA0,115200
 +bootargs_mmc=setenv bootargs root=/dev/mmcblk0p2 rootwait console=tty1 console=ttyAMA0,115200
 +bootargs_nfs=setenv bootargs root=/dev/nfs rw ip=${ipaddr} console=ttyAMA0,115200 nfsroot=${serverip}:${nfsroot_path},nfsvers=4
 +bootcmd=run distro_bootcmd
@@ -140,114 +134,42 @@ index 0000000000..5d8b632076
 +bootcmd_usb0=setenv devnum 0; run usb_boot
 +bootdelay=3
 +bootfstype=fat
-+cpu=armv7
-+devnum=0
-+devplist=1
-+devtype=mmc
 +dhcpuboot=usb start; dhcp u-boot.uimg; bootm
++disable_bt=fatload mmc 0:1 ${fdt_ov_addr_r} overlays/disable-bt.dtbo; if fdt addr $fdt_ov_addr_r}; then fdt addr ${fdt_addr_r}; fdt resize 8192; fdt apply ${fdt_ov_addr_r}; fi
 +distro_bootcmd=for target in ${boot_targets}; do run bootcmd_${target}; done
 +efi_dtb_prefixes=/ /dtb/ /dtb/current/
 +eth_boot=run bootargs_nfs; setenv zImage_fdtfile ${fdtfile}; setenv zImage_zimagefile ${zimagefile}; if run tftp_zImage; then if run tftp_zImage_dtb; then run boot_zImage; fi; fi
-+ethact=smsc95xx_eth
-+ethaddr=b8:27:eb:9e:90:a0
-+fdt_addr=2effbf00
-+fdt_addr_r=0x02000000
-+fdt_high=ffffffff
-+fdtcontroladdr=39bdc320
-+fdtfile=bcm2709-rpi-2-b.dtb
-+fileaddr=1000000
-+filesize=e
-+initrd_high=ffffffff
-+ipaddr=192.168.10.100
-+kernel_addr_r=0x01000000
 +load_efi_dtb=load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${efi_fdtfile}
 +load_zImage=${bootfstype}load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} ${prefix}${zImage_zimagefile}
 +load_zImage_dtb=${bootfstype}load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${zImage_fdtfile}
-+loadaddr=0x00200000
 +mmc_boot=if mmc dev ${devnum}; then run bootargs_mmc; setenv devtype mmc; run scan_dev_for_boot_part; fi
 +nfsroot_path=/home/student/linux-kernel-labs/modules/nfsroot
 +preboot=usb start
-+pxefile_addr_r=0x00100000
-+ramdisk_addr_r=0x02100000
 +scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_zImage; run scan_dev_for_extlinux; run scan_dev_for_scripts; done; run scan_dev_for_efi;
 +scan_dev_for_boot_part=part list ${devtype} ${devnum} -bootable devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done
 +scan_dev_for_efi=setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${efi_fdtfile}; then run load_efi_dtb; fi;done;if test -e ${devtype} ${devnum}:${distro_bootpart} efi/boot/bootarm.efi; then echo Found EFI removable media binary efi/boot/bootarm.efi; run boot_efi_binary; echo EFI LOAD FAILED: continuing...; fi; setenv efi_fdtfile
 +scan_dev_for_extlinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}extlinux/extlinux.conf; then echo Found ${prefix}extlinux/extlinux.conf; run boot_extlinux; echo SCRIPT FAILED: continuing...; fi
 +scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done
 +scan_dev_for_zImage=setenv zImage_fdtfile ${fdtfile}; setenv zImage_zimagefile ${zimagefile}; if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_zimagefile}; then echo Found ${prefix}${zImage_zimagefile}; run load_zImage; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${zImage_fdtfile}; then run load_zImage_dtb; run boot_zImage; fi; done; echo ZIMAGE FAILED: continuing...; fi
-+scriptaddr=0x02000000
-+serial#=00000000489e90a0
-+serverip=192.168.10.1
-+soc=bcm283x
-+stderr=serial,lcd
-+stdin=serial,usbkbd
-+stdout=serial,lcd
 +tftp_zImage=tftp ${kernel_addr_r} ${zImage_zimagefile}
 +tftp_zImage_dtb=tftp ${fdt_addr_r} ${zImage_fdtfile}
 +usb_boot=usb start; if usb dev ${devnum}; then setenv devtype usb; run scan_dev_for_boot_part; fi
-+usbethaddr=b8:27:eb:9e:90:a0
-+vendor=raspberrypi
++stderr=serial,lcd
++stdin=serial,usbkbd
++stdout=serial,lcd
++fdt_addr=2effbf00
++fdt_high=ffffffff
++initrd_high=ffffffff
++kernel_addr_r=0x00080000
++scriptaddr=0x02400000
++pxefile_addr_r=0x02500000
++fdt_addr_r=0x02600000
++fdt_ov_addr_r=0x02620000
++ramdisk_addr_r=0x02700000
 +zimagefile=zImage
-diff --git a/configs/raspberrypi2_defconfig b/configs/raspberrypi2_defconfig
-index 1eee3ae37e..64d1c5a902 100644
---- a/configs/raspberrypi2_defconfig
-+++ b/configs/raspberrypi2_defconfig
-@@ -2,17 +2,27 @@ BR2_arm=y
- BR2_cortex_a7=y
- BR2_ARM_EABIHF=y
- BR2_ARM_FPU_NEON_VFPV4=y
--
-+BR2_SHARED_STATIC_LIBS=y
-+BR2_TOOLCHAIN_BUILDROOT_WCHAR=y
-+BR2_PTHREAD_DEBUG=y
-+BR2_TOOLCHAIN_BUILDROOT_USE_SSP=y
- BR2_TOOLCHAIN_BUILDROOT_CXX=y
--
-+BR2_PACKAGE_HOST_GDB=y
-+BR2_PACKAGE_HOST_GDB_TUI=y
-+BR2_PACKAGE_HOST_GDB_PYTHON=y
-+BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV=y
-+BR2_TARGET_GENERIC_ROOT_PASSWD="root"
-+BR2_TARGET_GENERIC_GETTY_PORT="/dev/ttyAMA0"
-+BR2_TARGET_GENERIC_GETTY_BAUDRATE_115200=y
- BR2_SYSTEM_DHCP="eth0"
- 
- # Linux headers same as kernel, a 5.10 series
- BR2_PACKAGE_HOST_LINUX_HEADERS_CUSTOM_5_10=y
- 
- BR2_LINUX_KERNEL=y
--BR2_LINUX_KERNEL_CUSTOM_TARBALL=y
--BR2_LINUX_KERNEL_CUSTOM_TARBALL_LOCATION="$(call github,raspberrypi,linux,4afd064509b23882268922824edc5b391a1ea55d)/linux-4afd064509b23882268922824edc5b391a1ea55d.tar.gz"
-+BR2_LINUX_KERNEL_CUSTOM_GIT=y
-+BR2_LINUX_KERNEL_CUSTOM_REPO_URL="https://github.com/raspberrypi/linux.git"
-+BR2_LINUX_KERNEL_CUSTOM_REPO_VERSION="8e1110a580887f4b82303b9354c25d7e2ff5860e"
- BR2_LINUX_KERNEL_DEFCONFIG="bcm2709"
- 
- # Build the DTB from the kernel sources
-@@ -21,10 +31,23 @@ BR2_LINUX_KERNEL_INTREE_DTS_NAME="bcm2709-rpi-2-b"
- 
- BR2_LINUX_KERNEL_NEEDS_HOST_OPENSSL=y
- 
-+BR2_PACKAGE_GDB=y
- BR2_PACKAGE_RPI_FIRMWARE=y
- # BR2_PACKAGE_RPI_FIRMWARE_INSTALL_DTB_OVERLAYS is not set
- 
- # Required tools to create the SD image
-+BR2_PACKAGE_EVTEST=y
-+BR2_PACKAGE_LIBSVG_CAIRO=y
-+BR2_PACKAGE_DTC=y
-+BR2_PACKAGE_DTC_PROGRAMS=y
-+BR2_PACKAGE_LIBUSB=y
-+BR2_PACKAGE_TSLIB=y
-+BR2_PACKAGE_NCURSES=y
-+BR2_PACKAGE_DROPBEAR=y
-+BR2_PACKAGE_OPENSSH=y
-+BR2_TARGET_ROOTFS_TAR_BZIP2=y
-+BR2_TARGET_UBOOT=y
-+BR2_TARGET_UBOOT_BOARD_DEFCONFIG="rpi_2"
- BR2_PACKAGE_HOST_DOSFSTOOLS=y
- BR2_PACKAGE_HOST_GENIMAGE=y
- BR2_PACKAGE_HOST_MTOOLS=y
++fdtfile=bcm2709-rpi-2-b.dtb
++ipaddr=192.168.10.100
++serverip=192.168.10.1
 -- 
-2.25.1
+2.34.1
 

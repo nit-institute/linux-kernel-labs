@@ -1,15 +1,15 @@
 =========================================================================
 Instalacija toolchain-a, tftp-a, nfs servera i drugo na host racunar
 =========================================================================
-sudo apt-get install gcc-arm-linux-gnueabihf
-sudo apt-get install tftpd-hpa
-sudo apt-get install nfs-kernel-server
+sudo apt install gcc-arm-linux-gnueabihf
+sudo apt install tftpd-hpa
+sudo apt install nfs-kernel-server
 (potrebno za svaki terminal pokrenuti ponovo komande koje slede...)
 export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabihf-
 priprema usb2serial na host PC (u VM):
 	podešavanje USB settings u VM tako da se usb2serial prijavi i na VM
-	sudo apt-get install picocom
+	sudo apt install picocom
 	picocom -b 115200 ttyUSB0
 
 =========================================================================
@@ -35,9 +35,9 @@ sdcard.img - image sd kartice koji je dovoljno naprziti na karticu:
 			v. Kliknite na dugme "Write"
 		b. Linux
 			i. df -h
-			ii. umount /dev/mmcblk0p1, ako je mmcblk0p1 prikljucena sd kartica, particija 1
-			iii. umount /dev/mmcblk0p2, ako je mmcblk0p2 prikljucena sd kartica, particija 2
-			iv. dd bs=4M status=progress if=sdcard.img of=/dev/mmcblk0, ako je sdd1 prikljucena sd kartica, a sdcard.img image koji treba naprziti
+			ii. sudo umount /dev/sdb1, ako je sdb1 prikljucena sd kartica, particija 1
+			iii. sudo umount /dev/sdb2, ako je sdb2 prikljucena sd kartica, particija 2
+			iv. sudo dd bs=4M status=progress if=sdcard.img of=/dev/sdb, ako je sdb prikljucena sd kartica, a sdcard.img image koji treba naprziti
 			v. sudo sync
 		c. rpi
 			tftp 0x01000000 sdcard.img
@@ -47,33 +47,32 @@ sdcard.img - image sd kartice koji je dovoljno naprziti na karticu:
 =========================================================================
 Podesavanja za boot preko NFS (OUTDATED PATHS)
 =========================================================================
-u u-boot folderu se nalazi:
+u ovom folderu se nalazi:
 	u-boot.bin / image u-boot-a, da bi se pokrenuo treba ga kopirati na sd karticu rpi-a na boot particiju i u config.txt fajlu dodati liniju "kernel=u-boot.bin"
 	Kada se upali rpi, treba prekinuti timer koji pocne da odbrojava pritiskom na enter i ulazi se u u-boot.
 
-u kernelAndDtb folderu se nalaze:
 	zImage - image kernela
-	bcm2709-rpi-2-b.dtb - device tree blob koji se koristi uz kernel
+	bcm2711-rpi-4-b.dtb - device tree blob koji se koristi uz kernel
 
 	Ove fajlove je potrebno podeliti preko tftp servera kako bi mogli da se prebace na rpi. Koristimo tftpd-hpa server.
 	Instalira se komandom
-		"sudo apt-get install tftpd-hpa".
+		"sudo apt install tftpd-hpa".
 	Ukoliko se nista ne menja folder koji se deli na mrezi je
-		/var/lib/tftpboot.
+		/srv/tftp
 	U taj folder treba prebaciti fajlove (image i device tree blob)
 	Restartovati server komandom
 		"sudo service tftpd-hpa restart".
 	Fajlovi se u pokrenuti u-boot prebaciju komandama:
 		setenv ipaddr <ip adresa> - ip koji dodeljujemo ploci, bilo koji slobodan ip na mrezi
 		setenv serverip <ip adresa> - ip adresa racunara na kom se nalazi tftp server
-		setenv bootargs "root=/dev/nfs rw ip=<ip adresa rpi-a> console=ttyAMA0 nfsroot=<ip adresa racunara na kom je nfs server>:<putanja do rfs-a na racunaru>"
+		setenv bootargs "root=/dev/nfs rw ip=<ip adresa rpi-a> console=ttyAMA0 nfsroot=<ip adresa racunara na kom je nfs server>:<putanja do rfs-a na racunaru>,nfsvers=4"
 		saveenv
 		tftp 0x1000000 zImage - download kernela
-		tftp 0x2000000 bcm2709-rpi-2-b.dtb - download dtb-a
+		tftp 0x2000000 bcm2711-rpi-4-b.dtb - download dtb-a
 		bootz 0x1000000 - 0x2000000
 
 	boot se kasnije moze automatizovati	
-		setenv bootcmd "tftp 0x1000000 zImage; tftp 0x2000000 bcm2709-rpi-2-b.dtb; bootz 0x1000000 - 0x2000000"
+		setenv bootcmd "tftp 0x1000000 zImage; tftp 0x2000000 bcm2711-rpi-4-b.dtb; bootz 0x1000000 - 0x2000000"
 
 u folderu rootfs se nalaze: rootfs.ext2, rootfs.tar i rootfs.tar.bz2
 	opcija 1: rootfs.tar.bz2 - kompresovana verzija rfs-a, potrebno je raspakovati i dobijeni folder exportovati preko nfs servera pre pokretanja
@@ -86,7 +85,7 @@ u folderu rootfs se nalaze: rootfs.ext2, rootfs.tar i rootfs.tar.bz2
 	Posle toga dodati lokacije koje se exportuju u fajl /etc/exports u formatu
 		"<putanja koja se exportuje> <ip adresa rpi-a>(rw,no_root_squash,no_subtree_check)"
 	Restartovati nfs server komandom
-		"sudo /etc/init.d/nfs-kernel-server restart"
+		"sudo service nfs-kernel-server restart"
 
 =========================================================================
 Przenje na sd karticu
@@ -114,7 +113,7 @@ u-boot.bin - image u-boot-a, da bi se pokrenuo treba ga kopirati na sd karticu r
 uboot.env - bin fajl sa opisom env varijabli u-boot-a, treba da se nalazi na sd kartici, pored u-boot.bin i u tom slucaju ce ga u-boot koristiti za pocetnu konfiguraciju, a ako ne postoji koristice default.
 
 zImage - image kernela
-bcm2709-rpi-2-b.dtb - device tree blob koji se koristi uz kernel
+bcm2711-rpi-4-b.dtb - device tree blob koji se koristi uz kernel
 	Ove fajlove je potrebno podeliti preko tftp servera kako bi mogli da se prebace na rpi. Koristimo tftpd-hpa server. Instalira se sa "sudo apt-get install tftpd-hpa". Ukoliko se nista ne menja folder koji se deli na mrezi je /var/lib/tftpboot. U taj folder treba prebaciti fajlove i restartovati server sa komandom "sudo service tftpd-hpa restart".
 	Fajlovi se u pokrenuti u-boot prebaciju komandama.
 	setenv ipaddr <ip adresa> - ip koji dodeljujemo ploci, bilo koji slobodan ip na mrezi
@@ -122,11 +121,11 @@ bcm2709-rpi-2-b.dtb - device tree blob koji se koristi uz kernel
 	setenv bootargs "root=/dev/nfs rw ip=<ip adresa rpi-a> console=ttyAMA0 nfsroot=<ip adresa racunara na kom je nfs server>:<putanja do rfs-a na racunaru>"
 	saveenv
 	tftp 0x1000000 zImage - download kernela
-	tftp 0x2000000 bcm2709-rpi-2-b.dtb - download dtb-a
+	tftp 0x2000000 bcm2711-rpi-4-b.dtb - download dtb-a
 	bootz 0x1000000 - 0x2000000
 
 	boot se kasnije moze automatizovati	
-	setenv bootcmd "tftp 0x1000000 zImage; tftp 0x2000000 bcm2709-rpi-2-b.dtb; bootz 0x1000000 - 0x2000000"
+	setenv bootcmd "tftp 0x1000000 zImage; tftp 0x2000000 bcm2711-rpi-4-b.dtb; bootz 0x1000000 - 0x2000000"
 
 rootfs.ext2.tar.bz2 - kompresovana verzija image-a root fs, pre pokretanja ga treba mountovati na neki folder koji se exportuje sa nfs serverom
 rootfs.tar.bz2 - kompresovana verzija rfs-a, potrebno je raspakovati i taj folder exportovati preko nfs servera pre pokretanja
@@ -142,23 +141,25 @@ src/rootfs/ - minimalni rootfs (busybox)
 Bildovanje kernela
 =========================================================================
 prereq:
-	sudo apt-get install flex
-	sudo apt-get install bison
-	sudo apt-get install libssl-dev
-	sudo apt-get install qtbase5-dev
-	sudo apt-get install g++
+	sudo apt install flex
+	sudo apt install bison
+	sudo apt install libssl-dev
+	sudo apt install qtbase5-dev
+	sudo apt install g++
+	sudo apt install pkg-config
 
-git clone -b rpi-5.10.y --single-branch https://github.com/raspberrypi/linux --depth=1
-git branch 5.10.y 8e1110a580887f4b82303b9354c25d7e2ff5860e
-git checkout 5.10.y.
+git clone -b rpi-6.1.y --single-branch https://github.com/raspberrypi/linux --depth=1
+git fetch –depth=1 origin 17f135b742c4edb340afb365873c3a574f7e16cb
+git checkout -b linux_kernel_build 17f135b742c4edb340afb365873c3a574f7e16cb
 
 cd linux
-make bcm2709_defconfig
+make bcm2711_defconfig
 make
 
 =========================================================================
 Bildovanje minimalnog rootfs-a
 =========================================================================
+<TBD>
 wget http://www.busybox.net/downloads/busybox-1.33.1.tar.bz2
 tar xvjf busybox-1.33.1.tar.bz2 <direktorijum gde ce biti raspakovano>
 opcija 1:
@@ -196,9 +197,9 @@ git clone git://git.denx.de/u-boot.git
 make rpi_2_defconfig
 make all
 	branch:
-		v2021.07
+		v2024.01
 	u trenutku build-a:
-		(2021.07) 840658b093976390e9537724f802281c9c8439f5
+		(2024.01) 866ca972d6c3cabeaf6dbac431e8e08bb30b3c8e
 
 =========================================================================
 Bildovanje rootfs (buildroot)
@@ -214,7 +215,7 @@ Bildovanje toolchain-a (buildroot)
 Bildovanje kernel-a, rootfs-a i toolchain-a (buildroot)
 =========================================================================
 prereq:
-	sudo apt-get install device-tree-compiler
+	sudo apt install device-tree-compiler
 
 verzija:
 	2023.11.x
@@ -230,7 +231,7 @@ kernel:
 firmware:
 	https://github.com/raspberrypi/firmware
 	u trenutku build-a:
-		(6.1.61 rpi4)  83dafbc92c0e63f76ca2ecdd42462d56489d1c77
+		(6.1.61)  83dafbc92c0e63f76ca2ecdd42462d56489d1c77
 		
 u-boot:
 	2024.01
@@ -260,9 +261,14 @@ konfiguracija
 	opcija 2)
 		koristiti patch bootloader/rpi-4-b/src/0001-RPI4-customization-for-EMBEDDED-LINUX-course.patch
 		ako je potrebno generisati uboot.env od tekstualnog uboot_env.txt (prethodno je potrebno preuzimanje i bildovanje u-boot-a, vidi gore):
-			../../../u-boot/tools/mkenvimage -s 0x4000 -p 0x00 -o uboot.env uboot_env.txt
+			../../output/build/uboot-2024.01/tools/mkenvimage -s 0x4000 -p 0x00 -o uboot.env uboot_env.txt
 		git apply <patch>
-		make raspberrypi4_defconfig
+		opcija a) ručno:
+			make raspberrypi4_defconfig
+			make xconfig
+			...
+		opcija b) kopirati priloženu datoteku kao .config u buildroot/
+			modules/data/buildroot-2023.11-all.config
 
 bildovanje
 	make

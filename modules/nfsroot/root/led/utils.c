@@ -60,58 +60,6 @@ static u8 GetGPIOPinOffset(u8 pin)
 }
 
 /*
- * SetInternalPullUpDown function
- *  Parameters:
- *   regs      - virtual address where the physical GPIO address is mapped
- *   pin       - number of GPIO pin;
- *   pull      - set internal pull up/down/none if PULL_UP/PULL_DOWN/PULL_NONE selected
- *  Operation:
- *   Sets to use internal pull-up or pull-down resistor, or not to use it if pull-none
- *   selected for desired GPIO pin.
- */
-void SetInternalPullUpDown(void __iomem *regs, u8 pin, PUD pull)
-{
-    u32 gppud_offset;
-    u32 gppudclk_offset;
-    u32 tmp;
-    u32 mask;
-
-    /* Get the offset of GPIO Pull-up/down Register (GPPUD) from GPIO base address. */
-    gppud_offset = GPPUD_OFFSET;
-
-    /* Get the offset of GPIO Pull-up/down Clock Register (GPPUDCLK) from GPIO base address. */
-    gppudclk_offset = (pin < 32) ? GPPUDCLK0_OFFSET : GPPUDCLK1_OFFSET;
-
-    /* Get pin offset in register . */
-    pin = (pin < 32) ? pin : pin - 32;
-
-    /* Write to GPPUD to set the required control signal (i.e. Pull-up or Pull-Down or neither
-       to remove the current Pull-up/down). */
-    iowrite32(pull, regs + gppud_offset);
-
-    /* Wait 150 cycles – this provides the required set-up time for the control signal */
-
-    /* Write to GPPUDCLK0/1 to clock the control signal into the GPIO pads you wish to
-       modify – NOTE only the pads which receive a clock will be modified, all others will
-       retain their previous state. */
-    tmp = ioread32(regs + gppudclk_offset);
-    mask = 0x1 << pin;
-    tmp |= mask;
-    iowrite32(tmp, regs + gppudclk_offset);
-
-    /* Wait 150 cycles – this provides the required hold time for the control signal */
-
-    /* Write to GPPUD to remove the control signal. */
-    iowrite32(PULL_NONE, regs + gppud_offset);
-
-    /* Write to GPPUDCLK0/1 to remove the clock. */
-    tmp = ioread32(regs + gppudclk_offset);
-    mask = 0x1 << pin;
-    tmp &= (~mask);
-    iowrite32(tmp, regs + gppudclk_offset);
-}
-
-/*
  * SetGpioPinDirection function
  *  Parameters:
  *   regs      - virtual address where the physical GPIO address is mapped

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0
+
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -22,22 +24,25 @@ MODULE_LICENSE("Dual BSD/GPL");
 
 /* --------------- Constants definition -------------- */
 
-/* NOTE: Check Broadcom BCM8325 datasheet, page 91+
+/* NOTE: Check Broadcom BCM2711 datasheet, page 65+
  * NOTE: GPIO Base address is set to 0x7E200000,
- *       but it is VC CPU BUS address, while the
- *       ARM physical address is 0x3F200000, what
- *       can be seen in pages 5-7 of Broadcom
- *       BCM8325 datasheet, having in mind that
- *       total system ram is 0x3F000000 (1GB - 16MB)
- *       instead of 0x20000000 (512 MB)
+ *       but it is 32-bit Legacy Master address, while the
+ *       ARM physical address is 0xFE200000, what
+ *       can be seen in pages 4-7 of Broadcom
+ *       BCM2711 datasheet. Specifically, check the
+ *		 following from page 6: "So a peripheral described
+ *		 in this document as being at legacy address
+ *		 0x7Enn_nnnn is available in the 35-bit address
+ *       space at 0x4_7Enn_nnnn, and visible to the ARM at
+ *		 0x0_FEnn_nnnn if Low Peripheral mode is enabled."
  */
 
 /* GPIO registers base address. */
-#define GPIO_BASE_ADDR      (0x3F200000)
-#define GPIO_ADDR_SPACE_LEN (0xB4)
+#define GPIO_BASE_ADDR      (0xFE200000)
+#define GPIO_ADDR_SPACE_LEN (0xF4)
 
 /* GPIO pins used for leds. */
-#define ACT_LED_GPIO (47)
+#define ACT_LED_GPIO (42)
 
 // led blink interval
 #define ACT_LED_BLINK_PERIOD_MSEC (1000) /* 1s */
@@ -225,4 +230,3 @@ static long led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 /* Declaration of the init and exit functions. */
 module_init(led_init);
 module_exit(led_exit);
-

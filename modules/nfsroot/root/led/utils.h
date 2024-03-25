@@ -4,18 +4,6 @@
 #include "common.h"
 
 /*
- * SetInternalPullUpDown function
- *  Parameters:
- *   regs      - virtual address where the physical GPIO address is mapped
- *   pin       - number of GPIO pin;
- *   pull      - set internal pull up/down/none if PULL_UP/PULL_DOWN/PULL_NONE selected
- *  Operation:
- *   Sets to use internal pull-up or pull-down resistor, or not to use it if pull-none
- *   selected for desired GPIO pin.
- */
-void SetInternalPullUpDown(void __iomem *regs, u8 pin, PUD pull);
-
-/*
  * SetGpioPinDirection function
  *  Parameters:
  *   regs      - virtual address where the physical GPIO address is mapped

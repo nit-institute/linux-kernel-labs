@@ -53,23 +53,6 @@
 #define GPLEV1_OFFSET (0x00000038)
 //--
 
-//GPIO: 0-53
-/* GPIO Pin Pull-up/down Enable. */
-#define GPPUD_OFFSET (0x00000094)
-
-//GPIO: 0-31
-/* GPIO Pull-up/down Clock Register 0. */
-#define GPPUDCLK0_OFFSET (0x00000098)
-
-//GPIO: 32-53
-/* GPIO Pull-up/down Clock Register 1. */
-#define GPPUDCLK1_OFFSET (0x0000009C)
-//--
-
-/* PUD - GPIO Pin Pull-up/down */
-typedef enum {PULL_NONE = 0, PULL_DOWN = 1, PULL_UP = 2} PUD;
-//--
-
 //000 = GPIO Pin 'x' is an input
 //001 = GPIO Pin 'x' is an output
 // By default GPIO pin is being used as an input

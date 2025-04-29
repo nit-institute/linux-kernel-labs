@@ -194,7 +194,7 @@ bootargs treba postaviti samo parametre rw i console(=ttyAMA0)
 Bildovanje u-boot-a
 =========================================================================
 git clone git://git.denx.de/u-boot.git
-make rpi_2_defconfig
+make rpi_4_32b_defconfig
 make all
 	branch:
 		v2024.01

@@ -149,7 +149,7 @@ prereq:
 	sudo apt install pkg-config
 
 git clone -b rpi-6.1.y --single-branch https://github.com/raspberrypi/linux --depth=1
-git fetch –depth=1 origin 17f135b742c4edb340afb365873c3a574f7e16cb
+git fetch --depth=1 origin 17f135b742c4edb340afb365873c3a574f7e16cb
 git checkout -b linux_kernel_build 17f135b742c4edb340afb365873c3a574f7e16cb
 
 cd linux
